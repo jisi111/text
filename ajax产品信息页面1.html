@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="产品信息.css">
+</head>
+
+<body>
+    <div class="goods-info">
+        <!-- 左边-->
+        <div class="left">
+            <img src="" alt="">
+            <img src="" alt="">
+            <img src="" alt="">
+            <img src="" alt="">
+            <img src="" alt="">
+            <img src="" alt="">
+        </div>
+        <!-- 主图 -->
+        <div class="main">
+            <img src="" alt="">
+            <span>100%人工质检</span>
+            <span>全国包邮低价保障</span>
+            <span>7天无理由退货</span>
+            <a href="#" class="collect">收藏</a>
+            <a href="#" class="share">分享</a>
+            <a href="#" class="inform">举报</a>
+        </div>
+        <!-- 右边 -->
+        <div class="right">
+            <div class="right_top">
+                <h3>良品铺子碧根果奶油味干果坚果零食小吃办公室</h3>
+                <div class="price">
+                    <p class="new_price">￥20.9</p>
+                    <span class="old_price">参考价：￥58</span>
+                    <p>剩余：4天17时29分51秒</p>
+                    <div class="sale"">促销： <span>满减</span><p>满79元减20元，满159元减68元   详情》</p>
+                        </div>
+                </div>
+              
+            </div>
+            <div class="
+                        right_down">
+                        <p>
+                            <span class="nature">配送：</span>
+                            <span class="area">武汉市至 </span>
+                            <select name="" id="">
+                                <option value="">长沙</option>
+                                <option value="">杭州</option>
+                                <option value="">北京</option>
+                                <option value="">湘潭</option>
+                                <option value="">南京</option>
+                            </select>
+
+                            包邮，24小时发货
+                        </p>
+                        <p class="color">
+                            <span class="nature">颜色：</span>
+
+                        </p>
+                        <p class="goods_size">
+                            <span class="nature">尺码：</span>
+
+                        </p>
+                        <p class="number">
+                            <span class="nature">数量：</span>
+                            <i id="minus">-</i>
+                            <i id="sum"> 0 </i>
+                            <i id="add">+</i>
+
+                        </p>
+
+                        <a href="#">立即购买</a>
+                        <a href="#">加入购物车</a>
+                    </div>
+                </div>
+                <div class="shop-info">
+                    <img src="" alt="">
+                    <p class="buy"></p>
+                    <p class="prove">金牌认证</p>
+                    <p class="money">已缴纳保证金</p>
+                    <p class="business">营业执照</p>
+                    
+                    <p class="connect">联系客服</p>
+                </div>
+            </div>
+</body>
+<script>
+    var big_img = document.querySelector(".main>img");
+    var small_image = document.querySelectorAll(".left>img");
+    var new_price = document.querySelector(".price>.new_price");
+    var old_price = document.querySelector(".price>.old_price");
+    var city = document.querySelector(".right_down>p>.area");
+    var title = document.querySelector(".right_top>h3");
+    var store_img = document.querySelector(".shop-info>img");
+    var disC = document.querySelector(".sale>span");
+    var disP = document.querySelector(".sale>p");
+    var goods_color = document.querySelector(".color");
+    var goods_size = document.getElementsByClassName("goods_size")[0];
+    var add = document.getElementById("add");
+    var sum = document.getElementById("sum");
+    var minus = document.getElementById("minus");
+    var buy =document.getElementsByClassName("buy")[0];
+
+    var num = 0;
+    add.onclick = function () {
+        if (num <= 0) {
+            num = 0;
+        }
+        num++;
+        sum.innerHTML = num;
+    }
+    minus.onclick = function () {
+        num--;
+        if (num >= 0) {
+            sum.innerHTML = num;
+        } else {
+            sum.innerHTML = 0;
+        }
+    }
+
+
+
+    function getQueryString(goods_id) {
+        var reg = new RegExp("(^|&)" + goods_id + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+    var str = getQueryString("id");
+    $.ajax({
+        type: 'POST',
+        url: 'http://2ks5071554.qicp.vip:58229/goods-info',
+        dataType: 'json',
+        data: {
+            goods_id: str
+        },
+        success: function (data) {
+            var str = data.data.message;
+            // 价格
+            new_price.innerHTML = "￥" + str.nowprice;
+            old_price.innerHTML = "￥参考价" + str.oldprice;
+            // c城市
+            city.innerHTML = str.city + "至";
+            // 标题
+            title.innerHTML = str.title;
+            // 商店图片
+            store_img.src = str.store_img;
+            // 满减折扣
+            if (str.tag == "1") {
+                disC.innerHTML = "满件减";
+                disP.innerHTML = "满两件打4.9折   &nbsp; 详情&nbsp;》";
+            } else if (str.tag == "2") {
+                disC.innerHTML = "满减";
+                disP.innerHTML = str.sales + "&nbsp;&nbsp;详情&nbsp;》";
+            }
+
+                // 购买人数
+                buy.innerHTML= str.buy+"万人已购"
+            // 点击图片
+            big_img.src = str.big_pic[0];
+            for (var i = 0; i < str.sm_pic.length; i++) {
+                small_image[i].src = str.sm_pic[i];
+                small_image[i].ind = i;
+                small_image[i].onclick = function () {
+                    big_img.src = str.big_pic[this.ind];
+                }
+            }
+
+
+            //颜色
+
+            var color = str.color.split(",");
+            for (var i = 0; i < color.length; i++) {
+                var a = document.createElement("a");
+                a.ind=i;
+                var im = document.createElement("img");
+                var span = document.createElement("span");
+                im.src = str.color_pic[i];
+                goods_color.appendChild(a).appendChild(im);
+                a.appendChild(span);
+                span.innerHTML = color[i];
+            }
+             
+            // 尺码
+            var size = str.size.split(",");
+            for (var i = 0; i < size.length; i++) {
+                var size_a = document.createElement("a");
+                size_a.innerHTML = size[i];
+                goods_size.appendChild(size_a);
+
+            }
+            
+            goods_color.onclick =function(){
+   
+                taGet();
+            }
+
+
+             // 事件委托
+    function taGet(e){
+        var e = e || window.event;
+        var target = e.target || e.srcElement;
+        console.log(target);
+        for(var i = 0;i < color.length ;i++){
+            if(target.innerHTML == color [i]){
+              target.parentNode.className="goods_a";
+            }
+        }
+
+    }
+       
+
+
+       //
+        },
+
+        //点击图片
+
+
+
+        error: function (error) {
+
+        }
+    });
+
+   
+
+   
+</script>
+
+</html>
